@@ -15,8 +15,8 @@ data = {
 }
 """
 # Crear una lista de datos ficticios de notas para la Parte 1 y la Parte 2
-notas_part1 = [random.randint(1, 12) for _ in range(500)]  # Generar 100 notas aleatorias entre 0 y 10
-notas_part2 = [random.randint(1, 12) for _ in range(500)]
+notas_part1 = [random.randint(1, 12) for _ in range(10000)]  # Generar 100 notas aleatorias entre 0 y 10
+notas_part2 = [random.randint(1, 12) for _ in range(10000)]
 
 # Calcular la suma de las notas de la Parte 1 y la Parte 2
 suma_notas = [nota1 + nota2 for nota1, nota2 in zip(notas_part1, notas_part2)]
