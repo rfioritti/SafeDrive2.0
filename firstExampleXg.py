@@ -3,32 +3,32 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-# Sample dataset (you can replace this with your own dataset)
+# Ejemplo de datos de calificaciones de estudiantes
 data = {
-    'Feature1': [1, 2, 3, 4, 5],
-    'Feature2': [2, 3, 4, 5, 6],
-    'Label': [0, 0, 1, 1, 1],
+    'Nota_Part1': [4, 5, 3, 6, 5, 7, 2, 4],
+    'Nota_Part2': [7, 6, 4, 8, 7, 9, 3, 5],
+    'Examen_Final': [0, 0, 0, 1, 0, 1, 0, 0],
 }
 
-# Create a DataFrame from the sample dataset
+# Crear un DataFrame a partir de los datos de ejemplo
 df = pd.DataFrame(data)
 
-# Split the dataset into features and labels
-X = df[['Feature1', 'Feature2']]
-y = df['Label']
+# Dividir el conjunto de datos en características (X) y etiquetas (y)
+X = df[['Nota_Part1', 'Nota_Part2']]
+y = df['Examen_Final']
 
-# Split the dataset into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Dividir el conjunto de datos en conjuntos de entrenamiento y prueba
+X_entrenamiento, X_prueba, y_entrenamiento, y_prueba = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Create an XGBoost classifier
-model = xgb.XGBClassifier()
+# Crear un clasificador XGBoost
+modelo = xgb.XGBClassifier()
 
-# Train the model on the training data
-model.fit(X_train, y_train)
+# Entrenar el modelo con los datos de entrenamiento
+modelo.fit(X_entrenamiento, y_entrenamiento)
 
-# Make predictions on the test data
-y_pred = model.predict(X_test)
+# Hacer predicciones en los datos de prueba
+y_prediccion = modelo.predict(X_prueba)
 
-# Calculate accuracy
-accuracy = accuracy_score(y_test, y_pred)
-print(f"Accuracy: {accuracy * 100:.2f}%")
+# Calcular la precisión
+precision = accuracy_score(y_prueba, y_prediccion)
+print(f"Precisión: {precision * 100:.2f}%")
