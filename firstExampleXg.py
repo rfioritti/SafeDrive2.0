@@ -48,7 +48,7 @@ for x in suma_notas:
 data = {
     'Nota_Part1': notas_part1,
     'Nota_Part2': notas_part2,
-    'examen_Final': etiquetas,
+    'Examen_Final': etiquetas,
 }
 print("================================================")
 print(notas_part1)
