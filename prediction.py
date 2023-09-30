@@ -1,4 +1,7 @@
 # Supongamos que queremos predecir para un estudiante con una calificación de 4 en la primera parte y 8 en la segunda parte.
+import pandas as pd
+
+
 nueva_data = {
     'Nota_Part1': [4],
     'Nota_Part2': [8],
