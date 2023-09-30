@@ -22,10 +22,25 @@ notas_part2 = [random.randint(1, 12) for _ in range(50)]
 suma_notas = [nota1 + nota2 for nota1, nota2 in zip(notas_part1, notas_part2)]
 
 # Crear una lista de etiquetas (0 para no pasar, 1 para pasar) basada en la condición
-etiquetas = [1 if suma >= 18 and random.random() <= 0.75 else 0 for suma in suma_notas]
-etiquetas = [1 if suma >= 12 and suma < 18 and random.random() <= 0.45 else 0 for suma in suma_notas ]
-etiquetas = [1 if suma >= 8 and suma < 12 and random.random() <= 0.25 else 0 for suma in suma_notas ]
-etiquetas = [1 if suma < 8 and random.random() <= 0.10 else 0 for suma in suma_notas ]
+
+#etiquetas = [1 if suma >= 18 and random.random() <= 0.75 else 0 for suma in suma_notas]
+#etiquetas = [1 if suma >= 12 and suma < 18 and random.random() <= 0.45 else 1 for suma in suma_notas ]
+#etiquetas = [1 if suma >= 8 and suma < 12 and random.random() <= 0.25 else 0 for suma in suma_notas ]
+#etiquetas = [1 if suma < 8 and random.random() <= 0.10 else 0 for suma in suma_notas ]
+etiquetas = []
+
+for x in suma_notas:
+    if x >= 18 and random.random() <= 0.75:
+        etiquetas.append(1)
+    elif x >= 12 and x < 18 and random.random() <= 0.45:
+        etiquetas.append(1)
+    elif x >= 8 and x < 12 and random.random() <= 0.25:
+        etiquetas.append(1)
+    elif x < 8 and random.random() <= 0.10:
+        etiquetas.append(1)
+    else:
+        etiquetas.append(0)
+
 
 
 
