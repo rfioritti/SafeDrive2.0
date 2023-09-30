@@ -15,14 +15,19 @@ data = {
 }
 """
 # Crear una lista de datos ficticios de notas para la Parte 1 y la Parte 2
-notas_part1 = [random.randint(0, 12) for _ in range(50)]  # Generar 100 notas aleatorias entre 0 y 10
-notas_part2 = [random.randint(0, 12) for _ in range(50)]
+notas_part1 = [random.randint(1, 12) for _ in range(50)]  # Generar 100 notas aleatorias entre 0 y 10
+notas_part2 = [random.randint(1, 12) for _ in range(50)]
 
 # Calcular la suma de las notas de la Parte 1 y la Parte 2
 suma_notas = [nota1 + nota2 for nota1, nota2 in zip(notas_part1, notas_part2)]
 
 # Crear una lista de etiquetas (0 para no pasar, 1 para pasar) basada en la condición
-etiquetas = [1 if suma > 18 and random.random() <= 0.75 else 0 for suma in suma_notas]
+etiquetas = [1 if suma >= 18 and random.random() <= 0.75 else 0 for suma in suma_notas]
+etiquetas = [1 if suma >= 12 and suma < 18 and random.random() <= 0.45 else 0 for suma in suma_notas ]
+etiquetas = [1 if suma >= 8 and suma < 12 and random.random() <= 0.25 else 0 for suma in suma_notas ]
+etiquetas = [1 if suma < 8 and random.random() <= 0.10 else 0 for suma in suma_notas ]
+
+
 
 # Crear un DataFrame con los datos
 data = {
