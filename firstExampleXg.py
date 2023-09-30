@@ -1,5 +1,6 @@
 import xgboost as xgb
 import pandas as pd
+import joblib
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
@@ -33,3 +34,6 @@ y_prediccion = modelo.predict(X_prueba)
 # Calcular la precisión
 precision = accuracy_score(y_prueba, y_prediccion)
 print(f"Precisión: {precision * 100:.2f}%")
+
+# Guardar el modelo en un archivo
+joblib.dump(modelo, 'modelo_entrenado.pkl')

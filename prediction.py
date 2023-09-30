@@ -1,6 +1,9 @@
 # Supongamos que queremos predecir para un estudiante con una calificación de 4 en la primera parte y 8 en la segunda parte.
 import pandas as pd
+import joblib
 
+# Cargar el modelo entrenado desde el archivo
+modelo = joblib.load('modelo_entrenado.pkl')
 
 nueva_data = {
     'Nota_Part1': [4],
