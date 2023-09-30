@@ -7,7 +7,7 @@ modelo = joblib.load('modelo_entrenado.pkl')
 
 nueva_data = {
     'Nota_Part1': [4],
-    'Nota_Part2': [8],
+    'Nota_Part2': [4],
 }
 
 # Crear un DataFrame con la nueva data
