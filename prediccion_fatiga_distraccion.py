@@ -28,8 +28,8 @@ def predecir_probabilidades_fatiga_distraccion(recorrido):
     # Extrae la probabilidad de que ocurran los eventos
     probabilidad_dorm = probabilidad_dorm[:, 1]  # Probabilidad de "dormir"
     probabilidad_distraccion = probabilidad_distraccion[:, 1]  # Probabilidad de "distracción"
-    print("------")
-    print("prob dorm: "+ str(probabilidad_dorm[0])+"  prob distraccion: "+str(probabilidad_distraccion[0]))
+   # print("------")
+   # print("prob dorm: "+ str(probabilidad_dorm[0])+"  prob distraccion: "+str(probabilidad_distraccion[0]))
 
     return probabilidad_dorm[0], probabilidad_distraccion[0]
     
