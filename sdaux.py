@@ -28,10 +28,13 @@ guardar_recorrido(recorrido)
 
 dor, dist = predecir_probabilidades_fatiga_distraccion(recorrido)
 
+response_data = {"message": "Recorrido recibido, se envian las probabilidades de dormirse o distraerse.", "dor": dor, "dist": dist}
 
-# Envía una respuesta al cliente
-response = "Recorrido recibido, las probabilidades de dormirse o distraerse son:"
-client_socket.send(response.encode())
+# Convierte el diccionario a una cadena JSON
+response_json = json.dumps(response_data)
+
+# Envía la respuesta al cliente
+client_socket.send(response_json.encode())
 
 # Cierra el socket del cliente
 client_socket.close()
