@@ -2,23 +2,24 @@ import xgboost as xgb
 import joblib
 import pandas as pd
 
-def predecir_probabilidades_fatiga_distraccion(recorrido):
+def predecir_probabilidades_fatiga_distraccion(recorridos):
     # Cargar los modelos entrenados
     modelo_dorm = joblib.load('modelo_prediccion_dorm.pkl')
     modelo_distraccion = joblib.load('modelo_prediccion_distraccion.pkl')
 
     # Proporciona el recorrido como datos de entrada para las predicciones
     # Asegúrate de que el recorrido tenga las mismas características que se utilizaron durante el entrenamiento
+    recorrido = recorridos[0]
     datos_recorrido = pd.DataFrame({
-        'zini': [recorrido['zini']],
-        'zfin': [recorrido['zfin']],
-        'velProm': [recorrido['velProm']],
-        'velMax': [recorrido['velMax']],
-        'tRec': [recorrido['tRec']],
-        'AB': [recorrido['AB']],
-        'FB': [recorrido['FB']],
-        'kmRec': [recorrido['kmRec']],
-        'sints': [recorrido['sints']]
+        'z_inicial': [recorrido['z_inicial']],
+        'z_final': [recorrido['z_final']],
+        'velocidad_promedio': [recorrido['velocidad_promedio']],
+        'velocidad_maxima': [recorrido['velocidad_maxima']],
+        'tiempo_recorrido': [recorrido['tiempo_recorrido']],
+        'aceleraciones_bruscas': [recorrido['aceleraciones_bruscas']],
+        'frenadas_bruscas': [recorrido['frenadas_bruscas']],
+        'km_recorridos': [recorrido['km_recorridos']],
+        'sintomas': [recorrido['sintomas']]
     })
 
     # Realiza predicciones de probabilidad para "dormir" y "distracción"

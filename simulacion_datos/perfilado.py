@@ -86,7 +86,7 @@ for index, row in eventos_filtrados.iterrows():
     if not departamento.empty:
         eventos_filtrados.at[index, 'departamento'] = departamento.values[0]
     else:
-        eventos_filtrados.at[index, 'departamento'] = 'Exterior'
+        eventos_filtrados.at[index, 'departamento'] = 20
         
 #se agrupa por id y se crea una lista de los departamentos para cada id
 recorridos_completos = eventos_filtrados.groupby('id_recorrido')['departamento'].apply(list).reset_index()
@@ -99,8 +99,8 @@ recorridos_completos['z_final'] = recorridos_completos['departamento'].apply(lam
 recorridos_completos = recorridos_completos.merge(eventos_filtrados.drop(columns=['departamento']), on='id_recorrido', how='left')
     
 #eliminacion de columnas innecesarias y renombre de restantes
-recorridos_completos = recorridos_completos.drop(columns=['fecha_fin', 'fecha_evento','evento','distracciones', 'dormido', 'matricula_id', 'id_evento', 'velocidad', 'latitud', 'longitud', 'departamento'])
-recorridos_completos.rename(columns = {'fecha_inicio':'fecha', 'vel_promedio':'vel_prom', 'fecha_hora':'fecha_evento'}, inplace = True)
+recorridos_completos = recorridos_completos.drop(columns=['fecha_fin', 'fecha_hora','evento','distracciones', 'dormido', 'matricula_id', 'id_evento', 'velocidad', 'latitud', 'longitud', 'departamento'])
+recorridos_completos.rename(columns = {'fecha_inicio':'fecha', 'vel_promedio':'vel_prom'}, inplace = True)
     
 #se quitan las id duplicadas
 recorridos_completos.drop_duplicates(subset='id_recorrido', keep='first', inplace=True)

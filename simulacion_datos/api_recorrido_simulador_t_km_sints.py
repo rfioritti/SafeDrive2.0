@@ -31,7 +31,7 @@ for i in range(100):
     frenadas_bruscas = random.randint(0, 5)
     aceleraciones_bruscas = random.randint(0, 5)
     km_recorridos = round(tiempo_recorrido) / 60 * velocidad_promedio
-    matricula_id = 'TEST 123' #hay que hacer un random para utilizar 10 matriculas
+    matricula_id = ejemplos_matriculas[matricula_seleccionada] 
     distracciones_del_Recorrido = None
     dormidas_recorrido = None
 

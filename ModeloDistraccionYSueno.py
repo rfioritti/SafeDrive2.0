@@ -7,13 +7,13 @@ import warnings
 warnings.filterwarnings("ignore", category=FutureWarning, module="xgboost")
 
 # Cargar tus datos desde un archivo CSV (reemplaza 'datos.csv' con tu archivo de datos)
-data = pd.read_csv('datos.csv')
+data = pd.read_csv('/home/ubuntu/SafeDrive2.0/simulacion_datos/datos.csv')
 
 # Dividir el conjunto de datos en características (X) y etiquetas (y)
 # X = data[['zini', 'zfin', 'velProm', 'velMax', 'tRec', 'AB', 'FB', 'kmRec', 'sints']]
 X = data[['z_inicial', 'z_final', 'velocidad_promedio', 'velocidad_maxima', 'tiempo_recorrido', 'aceleraciones_bruscas', 'frenadas_bruscas', 'km_recorridos', 'sintomas']]
-y_dorm = data['dormido']
-y_distraccion = data['distracciones']
+y_dorm = data['dor']
+y_distraccion = data['dist']
 
 # Dividir el conjunto de datos en conjuntos de entrenamiento y prueba para la variable "dorm"
 X_entrenamiento, X_prueba, y_dorm_entrenamiento, y_dorm_prueba = train_test_split(X, y_dorm, test_size=0.2, random_state=42)

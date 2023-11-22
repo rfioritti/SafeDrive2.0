@@ -1,8 +1,11 @@
 import socket
+from procesar_respuesta import perfilar_consulta
+from guardadoDatos import guardar_recorrido
+from prediccion_fatiga_distraccion import predecir_probabilidades_fatiga_distraccion
 
 # Configura el servidor
 server_ip = '0.0.0.0'  # Escucha en todas las interfaces de red
-server_port = 8080
+server_port = 2225
 
 # Crea un socket para escuchar conexiones entrantes
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -20,8 +23,14 @@ print(f"Conexión aceptada desde {client_address}")
 data = client_socket.recv(1024)
 print(f"Datos recibidos: {data.decode()}")
 
+recorrido = perfilar_consulta(data.decode())
+guardar_recorrido(recorrido)
+
+dor, dist = predecir_probabilidades_fatiga_distraccion(recorrido)
+
+
 # Envía una respuesta al cliente
-response = "Hola, cliente! Recibí tu mensaje."
+response = "Recorrido recibido, las probabilidades de dormirse o distraerse son:"
 client_socket.send(response.encode())
 
 # Cierra el socket del cliente
