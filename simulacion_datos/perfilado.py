@@ -1,34 +1,13 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
-#LINEAS UTILES
-
-# df.to_csv(r'ruta\archivo.csv') EXPORTAR CSV
-# df = pd.read_csv('ruta\data.csv') LEER CSV
-# df.sort_values(['nombreColumna', 'nombreColumna2'], ascending = [bool, bool]) ORDENAR POR VARIAS COLUMNAS
-# df = df.drop(columns=['column_nameA', 'column_nameB']) ELIMINAR COLUMNAS
-
-
-# In[2]:
-
-
 import pandas as pd
 import geopandas as gpd
-
-pd.__version__
-
-
-# In[3]:
-
-
 from shapely.geometry import Point
+import pandas as pd
+import firebase_admin
+from firebase_admin import credentials, firestore
 
-
-# In[4]:
-
+cred = credentials.Certificate('/home/ubuntu/keys/safedrive-aux-firebase-adminsdk-5e35m-dd2ee6fa20.json')
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 recorridos = pd.read_csv(r'/home/ubuntu/SafeDrive2.0/simulacion_datos/recorridos_simulados.csv') #COLOCAR LA RUTA DEL CSV DE LOS RECORRIDOS
 eventos = pd.read_csv(r'/home/ubuntu/SafeDrive2.0/simulacion_datos/eventos_simulados.csv') #COLOCAR LA RUTA DEL CSV DE LOS EVENTOS
@@ -104,18 +83,16 @@ recorridos_completos.rename(columns = {'fecha_inicio':'fecha', 'vel_promedio':'v
     
 #se quitan las id duplicadas
 recorridos_completos.drop_duplicates(subset='id_recorrido', keep='first', inplace=True)
+
+recorridos_completos.set_index('id_recorrido')
+
+for index, row in recorridos_completos.iterrows():
+    # Convierte la fila a un diccionario para facilitar la manipulación
+    data_dict = row.to_dict()
+
+    # Agrega el documento a la colección 'miColeccion' en Firebase
+    db.collection('recorridos').add(data_dict)
     
 recorridos_completos.to_csv(r'/home/ubuntu/SafeDrive2.0/simulacion_datos/datos.csv') #EXPORTAR CSV / AJUSTAR LA RUTA DE SALIDA
-
-
-# In[7]:
-
-
-recorridos_completos
-
-
-# In[ ]:
-
-
 
 

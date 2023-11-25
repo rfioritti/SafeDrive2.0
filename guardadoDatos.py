@@ -1,17 +1,16 @@
 from firebase_admin import credentials, firestore, initialize_app
 
+# Configura las credenciales de Firebase
+cred = credentials.Certificate('/home/ubuntu/keys/safedrive-aux-firebase-adminsdk-5e35m-dd2ee6fa20.json')
+initialize_app(cred)
+
+# Obtén una referencia a la base de datos Firestore
+db = firestore.client()
 
 #Recibe un array de JSON
 def guardar_recorrido(recorrido_json):
     
     try:
-        # Configura las credenciales de Firebase
-        cred = credentials.Certificate('/home/ubuntu/keys/safedrive-aux-firebase-adminsdk-5e35m-dd2ee6fa20.json')
-        initialize_app(cred)
-
-        # Obtén una referencia a la base de datos Firestore
-        db = firestore.client()
-
         # Inserta los datos en la colección "recorridos"
         for recorrido in recorrido_json:
             db.collection('recorridos').document(str(recorrido["id_recorrido"])).set(recorrido)

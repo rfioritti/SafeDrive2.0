@@ -1,7 +1,15 @@
 import xgboost as xgb
 import joblib
 import pandas as pd
+import warnings
 
+# Suprimir todas las advertencias (no se recomienda a menos que estés seguro)
+warnings.filterwarnings("ignore")
+
+# O suprimir advertencias específicas
+warnings.filterwarnings("ignore", category=FutureWarning)
+
+#recorridos es un array de json
 def predecir_probabilidades_fatiga_distraccion(recorridos):
     # Cargar los modelos entrenados
     modelo_dorm = joblib.load('modelo_prediccion_dorm.pkl')
@@ -11,7 +19,7 @@ def predecir_probabilidades_fatiga_distraccion(recorridos):
     # Asegúrate de que el recorrido tenga las mismas características que se utilizaron durante el entrenamiento
     recorrido = recorridos[0]
     datos_recorrido = pd.DataFrame({
-        'z_inicial': [recorrido['z_inicial']],
+        'z_inicial': recorrido['z_inicial'],
         'z_final': [recorrido['z_final']],
         'velocidad_promedio': [recorrido['velocidad_promedio']],
         'velocidad_maxima': [recorrido['velocidad_maxima']],

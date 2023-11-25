@@ -1,10 +1,12 @@
 import geopandas as gpd
 from shapely.geometry import Point
+import json
 
 departamentos = gpd.read_file(r'/home/ubuntu/SafeDrive2.0/simulacion_datos/uruguay.geojson')
 
-def perfilar_consulta(consulta_json):
+def perfilar_consulta(data):
     
+    consulta_json = json.loads(data)
     
     dist = consulta_json['distracciones'] / consulta_json['tiempo_recorrido'] > 0.05
     dor = consulta_json['dormido'] > 0
@@ -30,8 +32,8 @@ def perfilar_consulta(consulta_json):
     recorrido = [
         {
             'id_recorrido' : consulta_json['id_recorrido'],
-            'z_inicial' : z_ini,
-            'z_final' : z_fin,
+            'z_inicial' : int(z_ini),
+            'z_final' : int(z_fin),
             'fecha' : consulta_json['fecha_inicio'],
             'velocidad_promedio' : consulta_json['velocidad_promedio'],
             'velocidad_maxima' : consulta_json['velocidad_maxima'],
