@@ -76,7 +76,7 @@ def encontrar_puntos_riesgo(perimetro):
     return lista_puntos_riesgo
 
 def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor '/home/ubuntu/SafeDrive2.0/simulacion_datos/uruguay.geojson'
-    departamentos = gpd.read_file(r'C:\Users\admin\Desktop\tesis\safedrive_aux\SafeDrive2.0\simulacion_datos\uruguay.geojson') #FUENTE: https://github.com/alotropico/uruguay.geo
+    departamentos = gpd.read_file(r'/home/ubuntu/SafeDrive2.0/simulacion_datos/uruguay.geojson') #FUENTE: https://github.com/alotropico/uruguay.geo
     dep = 0
     dep_prev = -12
 
