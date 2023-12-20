@@ -1,6 +1,7 @@
 from firebase_admin import credentials, firestore, initialize_app
 import pandas as pd
 
+
 # Configura las credenciales de Firebase
 cred = credentials.Certificate('/home/ubuntu/keys/safedrive-aux-firebase-adminsdk-5e35m-dd2ee6fa20.json')
 initialize_app(cred)
