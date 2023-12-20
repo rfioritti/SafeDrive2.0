@@ -1,14 +1,22 @@
+
 import socket
 import json
 import time
 from datetime import datetime
+
 from procesar_respuesta import perfilar_consulta
 from guardadoDatos import guardar_recorrido
 from prediccion_fatiga_distraccion import predecir_probabilidades_fatiga_distraccion
+
 from generar_CSV_modelo import actualizar_csv_firebase
+'''
 from ModeloDistraccionYSueno import crear_modelo
+'''
+
+print("prueba")
 
 
+'''
 def actualizar_modelo():
     
     actualizar_csv_firebase()
@@ -62,3 +70,5 @@ while True:
     
 
     time.sleep(1)
+
+    '''
