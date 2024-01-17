@@ -10,7 +10,7 @@ from shapely.geometry import Point
 from decimal import Decimal
 import math
 
-cred = credentials.Certificate(r"C:\Users\admin\Desktop\tesis\safedrive-aux-firebase-adminsdk-5e35m-dd2ee6fa20.json")
+cred = credentials.Certificate(r"/home/ubuntu/keys/safedrive-aux-firebase-adminsdk-5e35m-dd2ee6fa20.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -97,7 +97,7 @@ def conservar_columnas_pandas(directorio_entrada, archivo_csv_entrada, archivo_c
 
 def mapeo():
     # Leer el archivo CSV
-    archivo_entrada = 'salida_columnas.csv'
+    archivo_entrada = "/home/ubuntu/SafeDrive2.0/Datos_UNASEV/salida_columnas.csv"
     df = pd.read_csv(archivo_entrada)
 
     # Mapear los nombres de departamentos a valores enteros
@@ -256,13 +256,13 @@ def reduccion_datos(salida_geograficas):
 
 if __name__ == "__main__":
     
-    directorio_entrada = r"C:\Users\admin\Desktop\tesis\safedrive_aux\Datos UNASEV"
+    directorio_entrada = r"/home/ubuntu/SafeDrive2.0/Datos_UNASEV"
     archivo_salida_csv = 'salida.csv'
 
     fusionar_txt_a_csv(directorio_entrada, archivo_salida_csv)
 
-    archivo_csv_entrada = r"C:\Users\admin\Desktop\tesis\safedrive_aux\Datos UNASEV\salida.csv"
-    archivo_csv_salida = r'C:\Users\admin\Desktop\tesis\safedrive_aux\Datos UNASEV\salida_columnas.csv'
+    archivo_csv_entrada = r"/home/ubuntu/SafeDrive2.0/Datos_UNASEV/salida.csv"
+    archivo_csv_salida = r'/home/ubuntu/SafeDrive2.0/Datos_UNASEV/salida_columnas.csv'
 
     conservar_columnas_pandas(directorio_entrada, archivo_csv_entrada, archivo_csv_salida)
 
