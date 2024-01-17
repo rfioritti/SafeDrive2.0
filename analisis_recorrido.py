@@ -39,16 +39,24 @@ def calcular_distancias(coordenadas, coordenada_fija):
 # crea una lista de coordenadas alrededor de un punto que no superan el parametro estipulado
 # accidentes_dep debe ser un diccionario
 # retorna una diccionario
-def crear_perimetro_busqueda(punto_alpha,radio_perimetro,accidentes_dep):
+
+def eliminar_elementos_por_distancia(lista_diccionarios):
+    # Crear una nueva lista sin los elementos no deseados
+    # Crear una nueva lista con diccionarios cuya distancia es menor o igual a 4000
+    nueva_lista = []
+    for diccionario in lista_diccionarios:
+        distancia = diccionario.get('distancia', 1000000000)
+        if distancia <= 4000:
+            nueva_lista.append(diccionario)
+
+
+    return nueva_lista
+
+def crear_perimetro_busqueda_punto(punto_alpha,radio_perimetro,accidentes_dep):
 
     lista_accidentes = calcular_distancias(accidentes_dep,punto_alpha)
     lista_accidentes = sorted(lista_accidentes, key=lambda x: x["distancia"])# ordeno de menor a mayor
-    '''
-    print("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
-    for i in lista_accidentes:
-        print (i["distancia"])
-    print("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
-    '''
+    
     aux = [] #variable uitilizada en for
     # quedarme solo con los valores que si dist sea < radio perimietro
     for data in lista_accidentes:
@@ -59,12 +67,68 @@ def crear_perimetro_busqueda(punto_alpha,radio_perimetro,accidentes_dep):
     diccionario = {i: elemento for i, elemento in enumerate(aux)}
     lista_accidentes = diccionario
 
-    '''
-    print("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
-    for id,i in lista_accidentes.items():
-        print (str(i["distancia"])+ " //// "+str(i["gravedad"]))
-    print("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
-    '''
+    return lista_accidentes
+
+def convertir_bd_a_dict(data):
+    aux = {}
+
+    cont = 0
+    for clave,fila in data.items(): 
+        elementos_cadena = fila['cadena']
+        for fila_iterada in elementos_cadena:
+            aux[cont] = fila_iterada
+            cont +=1
+    return aux
+
+def crear_perimetro_busqueda(punto_alpha,radio_perimetro,accidentes_dep):
+    print("comenzo a ordenar perimetro ++++++++++++++++++++++++++++++++++++++++++++++++++" + str(len(accidentes_dep)))
+
+    # armo una lista con todos los centros del departamento actual
+    seleccion = {}
+    for llave,fila in accidentes_dep.items():
+        seleccion[llave] = fila['centro']
+
+    #calculo la distancia a todos los centro en comparacion del punto alpha
+    seleccion_aux = calcular_distancias(seleccion,punto_alpha)
+
+    # creo una lista con los centros a menos de 4000m del punto alpha
+    seleccion_aux = eliminar_elementos_por_distancia(seleccion_aux)
+
+    # elimino todos los elementos que estan fuera del perimetro reducido // en este caso filtramos y solo nos quedamos con los centros que estan amenos de 4000m de punto_alpha
+    elimino_llave = []
+   
+    for llave,fila in accidentes_dep.items():
+        eliminar = True
+        coord = fila['centro'] 
+        for i in seleccion_aux:
+            if coord['latitud'] == i['latitud'] and coord['longitud'] == i['longitud']:
+                eliminar = False
+                break
+        if eliminar == True:
+            elimino_llave.append(llave) 
+    for ii in elimino_llave:
+        del accidentes_dep[ii]
+        
+    print("perimetro reducido -> "+str(len(accidentes_dep)))
+    
+    # convierto a accidentes en un diccionarios de diccionarios para que sea compatibe con las funciones que trabajo (ago un diccionario que tiene todas las cordenadas en formato diccionario)
+    accidentes_dep = convertir_bd_a_dict(accidentes_dep)
+    print("cantidad de accidentes a evaluar --> "+str(len(accidentes_dep)))
+
+    lista_accidentes = calcular_distancias(accidentes_dep,punto_alpha)
+    lista_accidentes = sorted(lista_accidentes, key=lambda x: x["distancia"])# ordeno de menor a mayor
+    
+    aux = [] #variable uitilizada en for
+    # quedarme solo con los valores que si dist sea < radio perimietro
+    for data in lista_accidentes:
+        if data['distancia'] <= radio_perimetro:
+            aux.append(data)
+        else:
+            break
+    diccionario = {i: elemento for i, elemento in enumerate(aux)}
+    lista_accidentes = diccionario
+
+    print("termino de ordenar perimetro +++++++++++++++++++++++++++++++++++++++++++")
     return lista_accidentes
 
 # crea una lista de los puntos con gravedad = 1 osea alta
@@ -75,7 +139,9 @@ def encontrar_puntos_riesgo(perimetro):
             lista_puntos_riesgo.append(i)
     return lista_puntos_riesgo
 
-def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor '/home/ubuntu/SafeDrive2.0/simulacion_datos/uruguay.geojson'
+
+
+def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor C:\Users\admin\Desktop\tesis\safedrive_aux\SafeDrive2.0\simulacion_datos\uruguay.geojson
     departamentos = gpd.read_file(r'/home/ubuntu/SafeDrive2.0/simulacion_datos/uruguay.geojson') #FUENTE: https://github.com/alotropico/uruguay.geo
     dep = 0
     dep_prev = -12
@@ -109,48 +175,11 @@ def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor '/
             dep_prev = dep
             print("departamento: "+str(dep))   
 
-            # no borrar es la coneccion a bd
-            '''
+            # coneccion a bd
             accidentes = db.collection("accidentes").where("departamento", "==", int(dep)).stream() #consulta a la base de datos pqara obtener todos los accidente del departamento
             
             accidentes_dict = {documento.id: documento.to_dict() for documento in accidentes} # paso la consulta a diccionario
             accidentes = accidentes_dict # guardo el diccionario en accidentes
-            '''
-            # no borrar es la coneccion a bd
-
-            nombre_archivo = "hay_que_borrarlo_depues.csv"
-            '''
-            # Escribir el diccionario en un archivo CSV
-            with open(nombre_archivo, mode='w', newline='') as archivo_csv:
-                escritor = csv.DictWriter(archivo_csv, fieldnames=accidentes_dict[list(accidentes_dict.keys())[0]].keys())
-                escritor.writeheader()
-                escritor.writerows(accidentes_dict.values())
-            '''
-
-            # Leer el archivo CSV en una lista de diccionarios
-            
-            with open(nombre_archivo, mode='r') as archivo_csv:
-                lector = csv.DictReader(archivo_csv)
-                accidentes = list(lector)
-
-            # Convertir las cadenas JSON en diccionarios
-            for accidente in accidentes:
-                for key, value in accidente.items():
-                    accidente[key] = json.loads(value)
-            auxiliar = accidentes
-            accidentes = {}
-            mi_cont = 0
-            for ggg in auxiliar:
-                accidentes[mi_cont] = ggg
-                mi_cont += 1
-            
-            '''
-            print(accidentes)
-            print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
-            for id,mi_coord in accidentes.items():
-                print(str(mi_coord['latitud'])+"   "+str(mi_coord['longitud'])+"   "+str(mi_coord['departamento'])+"   "+str(mi_coord['gravedad']))
-            print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
-            '''
 
 
             
@@ -162,8 +191,9 @@ def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor '/
         else: # dist punto alpha a punto > actualizacion_alpha
             distancia_entre_puntos_km = geodesic((punto_alpha['latitud'],punto_alpha['longitud']), (coord['latitud'], coord['longitud'])).kilometers # calculo la dist entre alpha y el punto actual
             distancia_entre_puntos_metros = round(distancia_entre_puntos_km * 1000) #paso esa distancia en metros
-            if dep != 20 and distancia_entre_puntos_metros > radio_busqueda_punto:
+            if dep != 20 and distancia_entre_puntos_metros > actualizacion_alpha:
                 punto_alpha = coord
+                
                 lista_accidentes = crear_perimetro_busqueda(punto_alpha,radio_perimetro,accidentes)
 
 
@@ -171,7 +201,7 @@ def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor '/
             
         
         # listo todos los puntos que estan <= 25 metros de la coord actual
-        mi_perimietro = crear_perimetro_busqueda(coord,radio_busqueda_punto,lista_accidentes)
+        mi_perimietro = crear_perimetro_busqueda_punto(coord,radio_busqueda_punto,lista_accidentes)
         cant_accidentes = len(mi_perimietro)
         
         riesgo = riesgo + cant_accidentes
@@ -179,7 +209,7 @@ def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor '/
         puntos_riesgosos = encontrar_puntos_riesgo(mi_perimietro)
         for i in puntos_riesgosos:
             lista_puntos_riesgo.append(i)
-        '''
+        
         print("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
         print("cant accidentes --->  "+str(cant_accidentes))
         if len(lista_puntos_mas_accidentes) < 3:
@@ -192,7 +222,7 @@ def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor '/
             lista_puntos_mas_accidentes.pop()
             print("elimino el ultimo elemento  ====> "+str(lista_puntos_mas_accidentes[0]["accidentes"])+" ====== "+str(lista_puntos_mas_accidentes[1]["accidentes"])+" ====== "+str(lista_puntos_mas_accidentes[2]["accidentes"]))
             print("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
-        '''
+        
         #print(str(lista_puntos_mas_accidentes["coorenada"])+" ------> "+str(lista_puntos_mas_accidentes["accidentes"]))
 
     riesgo_total_ruta = riesgo/cant_coord_ruta
@@ -210,7 +240,6 @@ def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor '/
 
 
 
-'''
 # Ejemplo de uso con el JSON de las primeras 40 coordenadas
 json_coordenadas = {
   "Marcador1": {"latitud": "-34.90021805742509", "longitud": "-56.19106473959258"},
@@ -267,4 +296,3 @@ coordenada_fija = (-34.891525, -56.187188)
 #resultado_distancias = calcular_distancias(json_coordenadas,coordenada_fija)
 
 obtener_nivel_riesgo(json_coordenadas,db)
-'''
