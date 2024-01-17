@@ -240,7 +240,7 @@ def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor C:
 
 
 
-
+'''
 # Ejemplo de uso con el JSON de las primeras 40 coordenadas
 json_coordenadas = {
   "Marcador1": {"latitud": "-34.90021805742509", "longitud": "-56.19106473959258"},
@@ -297,3 +297,4 @@ coordenada_fija = (-34.891525, -56.187188)
 #resultado_distancias = calcular_distancias(json_coordenadas,coordenada_fija)
 
 obtener_nivel_riesgo(json_coordenadas,db)
+'''
