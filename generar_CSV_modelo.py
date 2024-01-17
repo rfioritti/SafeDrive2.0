@@ -3,11 +3,11 @@ import pandas as pd
 
 
 # Configura las credenciales de Firebase
-cred = credentials.Certificate('/home/ubuntu/keys/safedrive-aux-firebase-adminsdk-5e35m-dd2ee6fa20.json')
-initialize_app(cred)
+#cred = credentials.Certificate('/home/ubuntu/keys/safedrive-aux-firebase-adminsdk-5e35m-dd2ee6fa20.json')
+#initialize_app(cred)
 
 # Obtén una referencia a la base de datos Firestore
-db = firestore.client()
+#db = firestore.client()
 
 def actualizar_csv_firebase():
     docs = db.collection("recorridos").stream()

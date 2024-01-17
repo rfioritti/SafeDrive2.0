@@ -7,16 +7,19 @@ from datetime import datetime
 from procesar_respuesta import perfilar_consulta
 from guardadoDatos import guardar_recorrido
 from prediccion_fatiga_distraccion import predecir_probabilidades_fatiga_distraccion
+from firebase_admin import credentials, firestore, initialize_app
 
 from generar_CSV_modelo import actualizar_csv_firebase
-'''
+
 from ModeloDistraccionYSueno import crear_modelo
-'''
-
-print("prueba")
 
 
-'''
+# Configura las credenciales de Firebase
+cred = credentials.Certificate('/home/ubuntu/keys/safedrive-aux-firebase-adminsdk-5e35m-dd2ee6fa20.json')
+initialize_app(cred)
+db = firestore.client()
+
+
 def actualizar_modelo():
     
     actualizar_csv_firebase()
@@ -48,7 +51,7 @@ while True:
 
     print(recorrido)
 
-    firebase_response = guardar_recorrido(recorrido)
+    firebase_response = guardar_recorrido(recorrido, db)
     print(firebase_response)
     dor, dist = predecir_probabilidades_fatiga_distraccion(recorrido)
 
@@ -70,5 +73,3 @@ while True:
     
 
     time.sleep(1)
-
-    '''

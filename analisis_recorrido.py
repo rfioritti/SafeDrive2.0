@@ -216,9 +216,9 @@ def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor C:
             lista_puntos_mas_accidentes.append({"coordenada":coord, "accidentes":cant_accidentes})
         else:
             lista_puntos_mas_accidentes.append({"coordenada":coord, "accidentes":cant_accidentes})
-            print("agregue nuevo elemento   ====> "+str(lista_puntos_mas_accidentes[0]["accidentes"])+" ====== "+str(lista_puntos_mas_accidentes[1]["accidentes"])+" ====== "+str(lista_puntos_mas_accidentes[2]["accidentes"])+" ====== "+str(lista_puntos_mas_accidentes[3]["accidentes"]))
+            #print("agregue nuevo elemento   ====> "+str(lista_puntos_mas_accidentes[0]["accidentes"])+" ====== "+str(lista_puntos_mas_accidentes[1]["accidentes"])+" ====== "+str(lista_puntos_mas_accidentes[2]["accidentes"])+" ====== "+str(lista_puntos_mas_accidentes[3]["accidentes"]))
             lista_puntos_mas_accidentes = sorted(lista_puntos_mas_accidentes, key=lambda x: x["accidentes"], reverse=True)  # ordeno de mayor a menor
-            print("re ordeno   ====> "+str(lista_puntos_mas_accidentes[0]["accidentes"])+" ====== "+str(lista_puntos_mas_accidentes[1]["accidentes"])+" ====== "+str(lista_puntos_mas_accidentes[2]["accidentes"]))
+            #print("re ordeno   ====> "+str(lista_puntos_mas_accidentes[0]["accidentes"])+" ====== "+str(lista_puntos_mas_accidentes[1]["accidentes"])+" ====== "+str(lista_puntos_mas_accidentes[2]["accidentes"]))
             lista_puntos_mas_accidentes.pop()
             print("elimino el ultimo elemento  ====> "+str(lista_puntos_mas_accidentes[0]["accidentes"])+" ====== "+str(lista_puntos_mas_accidentes[1]["accidentes"])+" ====== "+str(lista_puntos_mas_accidentes[2]["accidentes"]))
             print("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
@@ -227,6 +227,7 @@ def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor C:
 
     riesgo_total_ruta = riesgo/cant_coord_ruta
     retornar = [riesgo_total_ruta,lista_puntos_mas_accidentes,lista_puntos_riesgo]
+    return retornar
 
     print("---------------- puntos peligrosos ----------------------")
     print(lista_puntos_riesgo)
@@ -286,7 +287,7 @@ json_coordenadas = {
 
 # Configura las credenciales del servicio de Firebase
                             # cambiar
-cred = credentials.Certificate('C:/Users/admin/Desktop/tesis/safedrive-aux-firebase-adminsdk-5e35m-dd2ee6fa20.json')
+cred = credentials.Certificate('/home/ubuntu/keys/safedrive-aux-firebase-adminsdk-5e35m-dd2ee6fa20.json')
 firebase_admin.initialize_app(cred)
 
 # Obtiene una referencia a la base de datos Firestore
