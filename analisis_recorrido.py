@@ -52,8 +52,8 @@ def eliminar_elementos_por_distancia(lista_diccionarios):
 
     return nueva_lista
 
-def crear_perimetro_busqueda_punto(punto_alpha,radio_perimetro,accidentes_dep):
-
+def crear_perimetro_busqueda_punto(punto_alpha,radio_perimetro,accidentes_dep2):
+    accidentes_dep = accidentes_dep2.copy()
     lista_accidentes = calcular_distancias(accidentes_dep,punto_alpha)
     lista_accidentes = sorted(lista_accidentes, key=lambda x: x["distancia"])# ordeno de menor a mayor
     
@@ -80,9 +80,9 @@ def convertir_bd_a_dict(data):
             cont +=1
     return aux
 
-def crear_perimetro_busqueda(punto_alpha,radio_perimetro,accidentes_dep):
-    print("comenzo a ordenar perimetro ++++++++++++++++++++++++++++++++++++++++++++++++++" + str(len(accidentes_dep)))
-
+def crear_perimetro_busqueda(punto_alpha,radio_perimetro,accidentes):
+    print("comenzo a ordenar perimetro ++++++++++++++++++++++++++++++++++++++++++++++++++" + str(len(accidentes)))
+    accidentes_dep = accidentes.copy()
     # armo una lista con todos los centros del departamento actual
     seleccion = {}
     for llave,fila in accidentes_dep.items():
@@ -128,7 +128,7 @@ def crear_perimetro_busqueda(punto_alpha,radio_perimetro,accidentes_dep):
     diccionario = {i: elemento for i, elemento in enumerate(aux)}
     lista_accidentes = diccionario
 
-    print("termino de ordenar perimetro +++++++++++++++++++++++++++++++++++++++++++")
+    print("termino de ordenar perimetro +++++++++++++++++++++++++++++++++++++++++++ "+ str(len(accidentes)))
     return lista_accidentes
 
 # crea una lista de los puntos con gravedad = 1 osea alta
@@ -152,6 +152,11 @@ def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor C:
     lista_puntos_mas_accidentes = []
     lista_puntos_riesgo = []
     cant_coord_ruta = len(ruta)
+
+    cant_foco_accidentes = int((cant_coord_ruta*50)/20000) #calculo la cantidad de elementos que va a tener el top de mas accidentes de la ruta segun la distancia de la misma
+    if cant_foco_accidentes < 3:
+        cant_foco_accidentes = 3
+
 
     punto_alpha = -1
     radio_perimetro = 2000 # radio en metros al cual se va aplicar el primetro de busqueda alrededor de un punto_alpha (cada ves que se actualice alpha se hace una busqueda completa)
@@ -184,7 +189,7 @@ def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor C:
 
             
             punto_alpha = {'latitud':coord['latitud'],'longitud': coord['longitud']}
-
+            
             lista_accidentes = crear_perimetro_busqueda(punto_alpha,radio_perimetro,accidentes)
 
             
@@ -193,7 +198,7 @@ def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor C:
             distancia_entre_puntos_metros = round(distancia_entre_puntos_km * 1000) #paso esa distancia en metros
             if dep != 20 and distancia_entre_puntos_metros > actualizacion_alpha:
                 punto_alpha = coord
-                
+                print("alpha fue actualizado ...........................................................................")
                 lista_accidentes = crear_perimetro_busqueda(punto_alpha,radio_perimetro,accidentes)
 
 
@@ -203,8 +208,6 @@ def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor C:
         # listo todos los puntos que estan <= 25 metros de la coord actual
         mi_perimietro = crear_perimetro_busqueda_punto(coord,radio_busqueda_punto,lista_accidentes)
         cant_accidentes = len(mi_perimietro)
-        
-        riesgo = riesgo + cant_accidentes
 
         puntos_riesgosos = encontrar_puntos_riesgo(mi_perimietro)
         for i in puntos_riesgosos:
@@ -212,7 +215,7 @@ def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor C:
         
         print("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
         print("cant accidentes --->  "+str(cant_accidentes))
-        if len(lista_puntos_mas_accidentes) < 3:
+        if len(lista_puntos_mas_accidentes) < cant_foco_accidentes:
             lista_puntos_mas_accidentes.append({"coordenada":coord, "accidentes":cant_accidentes})
         else:
             lista_puntos_mas_accidentes.append({"coordenada":coord, "accidentes":cant_accidentes})
@@ -224,23 +227,56 @@ def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor C:
             print("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
         
         #print(str(lista_puntos_mas_accidentes["coorenada"])+" ------> "+str(lista_puntos_mas_accidentes["accidentes"]))
+   
+    # calculo cual es la cocentracion de accidentes que posee
+    suma_top_concetracion_accidentes = 0
+    for i in lista_puntos_mas_accidentes:
+        suma_top_concetracion_accidentes = suma_top_concetracion_accidentes + i["accidentes"]
+    
+    #obtengo los promedios desde la colleccion historial de la BD
+    historial_ref = firestore.client().collection('historial').document("1")
+    doc_snapshot = historial_ref.get()
+    promedios = doc_snapshot.to_dict()
 
-    riesgo_total_ruta = riesgo/cant_coord_ruta
+    #inicializo variables con los promedios
+    promedio_accidentes_graves = promedios["promedio_accidentes_graves"]
+    promedio_concentracion_accidentes = promedios["promedio_concentracion_accidentes"]
+    total_elementos = promedios["total_elementos"]
+
+    #calculo los nuevos promedios
+    promedio_accidentes_graves = (promedio_accidentes_graves * total_elementos + len(lista_puntos_riesgo))/(total_elementos+1)
+    promedio_concentracion_accidentes = (promedio_concentracion_accidentes * total_elementos + suma_top_concetracion_accidentes)/(total_elementos+1)
+   
+    # calculo el riesgo con la ponderacion elegida
+    riesgo_total_ruta = ((suma_top_concetracion_accidentes/(promedio_concentracion_accidentes*2))*7)+((len(lista_puntos_riesgo)/(promedio_accidentes_graves*2))*3)
+
+   
+
+    historia = {
+        'promedio_concentracion_accidentes': promedio_concentracion_accidentes,
+        'promedio_accidentes_graves': promedio_accidentes_graves,
+        'total_elementos': total_elementos + 1 
+    }
+
+    # Guarda el diccionario como documento en la colección 'accidentes'
+    historial_ref.set(historia)
+
     retornar = [riesgo_total_ruta,lista_puntos_mas_accidentes,lista_puntos_riesgo]
-    return retornar
-
     print("---------------- puntos peligrosos ----------------------")
     print(lista_puntos_riesgo)
     print("---------------- riesgo de la ruta ----------------------")
-    print(riesgo/cant_coord_ruta)
+    print(riesgo_total_ruta)
     print("---------------- lista de 3 puntos con mas accidentes ----------------------")
     print(lista_puntos_mas_accidentes)
+    return retornar
+
+
         
 
 
 
-
 '''
+
 # Ejemplo de uso con el JSON de las primeras 40 coordenadas
 json_coordenadas = {
   "Marcador1": {"latitud": "-34.90021805742509", "longitud": "-56.19106473959258"},

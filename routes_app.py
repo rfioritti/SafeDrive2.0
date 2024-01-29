@@ -20,7 +20,7 @@ def receive_markers():
 
         map_results = obtener_nivel_riesgo(markers_json,db)
 
-        print(map_results)
+        #print(map_results)
 
 
 
