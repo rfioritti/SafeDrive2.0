@@ -10,10 +10,10 @@ app = Flask(__name__)
 CORS(app)
 
 # Configurar el servidor SMTP
-SMTP_SERVER = 'adinet.com.uy'
-SMTP_PORT = 25
-SMTP_USERNAME = 'rjff@vera.com.uy'  # Reemplaza con tu dirección de correo electrónico
-SMTP_PASSWORD = 'rjff13'  # Reemplaza con tu contraseña de correo electrónico
+SMTP_SERVER = 'smtp.gmail.com'
+SMTP_PORT = 587
+SMTP_USERNAME = 'seterisparibus2019@gmail.com'  # Reemplaza con tu dirección de correo electrónico
+SMTP_PASSWORD = 'telematica18'  # Reemplaza con tu contraseña de correo electrónico
 
 pending_logins = {}
 
