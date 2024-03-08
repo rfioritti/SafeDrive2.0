@@ -179,7 +179,7 @@ def cargar_csv_a_diccionario(nombre_archivo):
     return diccionario
 
 def obtener_nivel_riesgo(ruta,accidentes_dep_rpi,db):  # sustituir ruta cuando pasar al servidor  /home/ubuntu/SafeDrive2.0/simulacion_datos/uruguay.geojson
-    departamentos = gpd.read_file(r'C:\Users\admin\Desktop\tesis\safedrive_aux\SafeDrive2.0\simulacion_datos\uruguay.geojson') #FUENTE: https://github.com/alotropico/uruguay.geo
+    departamentos = gpd.read_file(r'/home/ubuntu/SafeDrive2.0/simulacion_datos/uruguay.geojson') #FUENTE: https://github.com/alotropico/uruguay.geo
     dep = 0
     if len(accidentes_dep_rpi) == 0:
         dep_prev = -12
@@ -217,18 +217,18 @@ def obtener_nivel_riesgo(ruta,accidentes_dep_rpi,db):  # sustituir ruta cuando p
             print("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* cambie de departamento *-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*")
             dep_prev = dep
             print("departamento: "+str(dep))   
-            '''
+            
             # coneccion a bd
             accidentes = db.collection("accidentes").where("departamento", "==", int(dep)).stream() #consulta a la base de datos pqara obtener todos los accidente del departamento
             
             accidentes_dict = {documento.id: documento.to_dict() for documento in accidentes} # paso la consulta a diccionario
             accidentes = accidentes_dict # guardo el diccionario en accidentes
-            '''
+            
 
             
-            csv_file = 'hay_que_borrarlo_depues.csv'
+            #csv_file = 'hay_que_borrarlo_depues.csv'
             #guardar_diccionario_en_csv(accidentes,csv_file)
-            accidentes = cargar_csv_a_diccionario(csv_file)
+            #accidentes = cargar_csv_a_diccionario(csv_file)
 
             eliminar = []
             for llave,fila in accidentes.items():
