@@ -14,11 +14,11 @@ app = Flask(__name__)
 CORS(app)
 
 # Configurar el servidor SMTP
-SERVER = 'smtp.gmail.com'
-PORT = 465
+SERVER = 'smtp-mail.outlook.com'
+PORT = 587
 CONTEXT = ssl.create_default_context()
-USERNAME = 'seterisparibus2019@gmail.com'  # Reemplaza con tu dirección de correo electrónico
-PASSWORD = 'jdnjkyfarmdglfds'  # Reemplaza con tu contraseña de correo electrónico
+USERNAME = 'pruebatesis2024@outlook.com'  # Reemplaza con tu dirección de correo electrónico
+PASSWORD = 'Safedrive2.0'  # Reemplaza con tu contraseña de correo electrónico
 
 pending_logins = {}
 
@@ -29,7 +29,8 @@ def send_email(to_email, subject, content):
     em['subject'] = subject
     em.set_content(content)
 
-    with smtplib.SMTP_SSL(SERVER, PORT, CONTEXT) as smtp:
+    with smtplib.SMTP(SERVER, PORT) as smtp:
+        smtp.starttls(context=CONTEXT)
         smtp.login(USERNAME, PASSWORD)
         smtp.sendmail(USERNAME, to_email, em.as_string())
 
