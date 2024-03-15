@@ -49,7 +49,7 @@ def eliminar_elementos_por_distancia(lista_diccionarios):
     return nueva_lista
 
 def crear_perimetro_busqueda_punto(punto_alpha,radio_perimetro,accidentes_dep):
-    print("perimetro a 25m del punto"+str(punto_alpha))
+    #print("perimetro a 25m del punto"+str(punto_alpha))
     lista_accidentes = calcular_distancias(accidentes_dep,punto_alpha)
     lista_accidentes = sorted(lista_accidentes, key=lambda x: x["distancia"])# ordeno de menor a mayor
     
@@ -78,7 +78,7 @@ def convertir_bd_a_dict(data):
     return aux
 
 def crear_perimetro_busqueda(punto_alpha,radio_perimetro,accidentes_dep):
-    print("comenzo a ordenar perimetro ++++++++++++++++++++++++++++++++++++++++++++++++++" + str(len(accidentes_dep)))
+    #print("comenzo a ordenar perimetro ++++++++++++++++++++++++++++++++++++++++++++++++++" + str(len(accidentes_dep)))
 
     # armo una lista con todos los centros del departamento actual
     seleccion = {}
@@ -106,11 +106,11 @@ def crear_perimetro_busqueda(punto_alpha,radio_perimetro,accidentes_dep):
     for ii in elimino_llave:
         del accidentes_dep[ii]
         
-    print("perimetro reducido -> "+str(len(accidentes_dep)))
+    #print("perimetro reducido -> "+str(len(accidentes_dep)))
     
     # convierto a accidentes en un diccionarios de diccionarios para que sea compatibe con las funciones que trabajo (hago un diccionario que tiene todas las cordenadas en formato diccionario)
     accidentes_dep = convertir_bd_a_dict(accidentes_dep)
-    print("cantidad de accidentes a evaluar --> "+str(len(accidentes_dep)))
+    #print("cantidad de accidentes a evaluar --> "+str(len(accidentes_dep)))
 
     lista_accidentes = calcular_distancias(accidentes_dep,punto_alpha)
     lista_accidentes = sorted(lista_accidentes, key=lambda x: x["distancia"])# ordeno de menor a mayor
@@ -125,7 +125,7 @@ def crear_perimetro_busqueda(punto_alpha,radio_perimetro,accidentes_dep):
     diccionario = {i: elemento for i, elemento in enumerate(aux)}
     lista_accidentes = diccionario
 
-    print("termino de ordenar perimetro +++++++++++++++++++++++++++++++++++++++++++")
+    #print("termino de ordenar perimetro +++++++++++++++++++++++++++++++++++++++++++")
     return lista_accidentes
 
 # crea una lista de los puntos con gravedad = 1 osea alta
@@ -186,7 +186,7 @@ def obtener_nivel_riesgo(ruta,accidentes_dep_rpi,db):  # sustituir ruta cuando p
     else:
         primer_elemento_dic = next(iter(accidentes_dep_rpi.items()))
         dep_prev =primer_elemento_dic[1]['departamento']
-        print(str(dep_prev)+"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
+        #print(str(dep_prev)+"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
 
     accidentes = "" #guardo la consulta de la BD del los accidedntes del departamento actual
     lista_accidentes = [] # lista de accidentes a un radio del punto alpha
@@ -214,9 +214,9 @@ def obtener_nivel_riesgo(ruta,accidentes_dep_rpi,db):  # sustituir ruta cuando p
         
         #verifico que la coordenada siga en el mismo dep, sino actualizo los puntos obtenidos
         if dep != dep_prev and dep < 20:
-            print("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* cambie de departamento *-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*")
+            #print("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* cambie de departamento *-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*")
             dep_prev = dep
-            print("departamento: "+str(dep))   
+            #print("departamento: "+str(dep))   
             
             # coneccion a bd
             accidentes = db.collection("accidentes").where("departamento", "==", int(dep)).stream() #consulta a la base de datos pqara obtener todos los accidente del departamento
@@ -238,12 +238,33 @@ def obtener_nivel_riesgo(ruta,accidentes_dep_rpi,db):  # sustituir ruta cuando p
                 del accidentes[ii]
             accidentes_dep_rpi = accidentes
 
-            print("cargado !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            #print("cargado !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         punto_alpha = {'latitud':coord['latitud'],'longitud': coord['longitud']}
 
         lista_accidentes = crear_perimetro_busqueda(punto_alpha,radio_perimetro,accidentes_dep_rpi)
         cant_accidentes = len(lista_accidentes)
-        retornar = [cant_accidentes,accidentes] 
+
+        #obtengo los promedios desde la colleccion historial de la BD
+        historial_ref = firestore.client().collection('historial').document("2")
+        doc_snapshot = historial_ref.get()
+        promedios = doc_snapshot.to_dict()
+        promedio_accidentes = promedios["promedio_accidentes"]
+        total_elementos = promedios["total_elementos"]
+
+        nuevo_prom = ((promedio_accidentes*total_elementos)+cant_accidentes)/(total_elementos+1)
+
+        historia = {
+        'promedio_accidentes': nuevo_prom,
+        'total_elementos': total_elementos + 1 
+        }
+
+        # Guarda el diccionario como documento en la colección 'accidentes'
+        historial_ref.set(historia)
+
+        riesgo_zona = (cant_accidentes/(promedio_accidentes*2))*10
+
+        retornar = [riesgo_zona,accidentes]
+        print(str(cant_accidentes)+"    "+str(riesgo_zona)) 
 
     return retornar
 

@@ -1,8 +1,7 @@
-
-import socket
+from flask import Flask, request, jsonify
+from datetime import datetime
 import json
 import time
-from datetime import datetime
 
 from procesar_respuesta import perfilar_consulta
 from guardadoDatos import guardar_recorrido
@@ -10,66 +9,34 @@ from prediccion_fatiga_distraccion import predecir_probabilidades_fatiga_distrac
 from firebase_admin import credentials, firestore, initialize_app
 
 from generar_CSV_modelo import actualizar_csv_firebase
-
 from ModeloDistraccionYSueno import crear_modelo
-
 
 # Configura las credenciales de Firebase
 cred = credentials.Certificate('/home/ubuntu/keys/safedrive-aux-firebase-adminsdk-5e35m-dd2ee6fa20.json')
 initialize_app(cred)
 db = firestore.client()
 
-
 def actualizar_modelo():
-    
     actualizar_csv_firebase()
     crear_modelo()
-    
 
-# Configura el servidor
-server_ip = '0.0.0.0'  # Escucha en todas las interfaces de red
-server_port = 2225
+app = Flask(__name__)
 
-# Crea un socket para escuchar conexiones entrantes
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind((server_ip, server_port))
-server_socket.listen(5)
+@app.route('/recibir_datos', methods=['POST'])
+def recibir_datos():
+    data = request.get_json()
 
-print(f"Esperando conexiones en {server_ip}:{server_port}")
-
-while True:
-    # Acepta la conexión entrante
-    client_socket, client_address = server_socket.accept()
-
-    print(f"Conexión aceptada desde {client_address}")
-
-    # Recibe datos del cliente
-    data = client_socket.recv(1024)
-    print(f"Datos recibidos: {data.decode()}")
-
-    recorrido = perfilar_consulta(data.decode())
-
-    print(recorrido)
+    recorrido = perfilar_consulta(json.dumps(data))
 
     firebase_response = guardar_recorrido(recorrido, db)
-    print(firebase_response)
+    #print(firebase_response)
     dor, dist = predecir_probabilidades_fatiga_distraccion(recorrido)
 
     response_data = {"message": "Recorrido recibido, se envian las probabilidades de dormirse o distraerse.", "dor": int(dor*100), "dist": int(dist*100)}
 
-    # Convierte el diccionario a una cadena JSON
-    response_json = json.dumps(response_data)
+    return jsonify(response_data)
 
-    # Envía la respuesta al cliente
-    client_socket.send(response_json.encode())
-
-    # Cierra el socket del cliente
-    client_socket.close()
-
-    now = datetime.now()
-    if now.day == 1:
-        if now.hour == 3:
-            actualizar_modelo()
-    
-
-    time.sleep(1)
+if __name__ == '__main__':
+    # Para despliegues de producción, cambiar a:
+    # app.run(host='0.0.0.0', port=2225)
+    app.run(host='0.0.0.0', port=2225, debug=True)

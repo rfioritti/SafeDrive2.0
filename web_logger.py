@@ -1,34 +1,37 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+import ssl
+from email.message import EmailMessage
+
 import random
 import string
+
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 CORS(app)
 
 # Configurar el servidor SMTP
-SMTP_SERVER = 'smtp.gmail.com'
-SMTP_PORT = 587
-SMTP_USERNAME = 'seterisparibus2019@gmail.com'  # Reemplaza con tu dirección de correo electrónico
-SMTP_PASSWORD = 'telematica18'  # Reemplaza con tu contraseña de correo electrónico
+SERVER = 'smtp.gmail.com'
+PORT = 465
+CONTEXT = ssl.create_default_context()
+USERNAME = 'seterisparibus2019@gmail.com'  # Reemplaza con tu dirección de correo electrónico
+PASSWORD = 'jdnjkyfarmdglfds'  # Reemplaza con tu contraseña de correo electrónico
 
 pending_logins = {}
 
 def send_email(to_email, subject, content):
-    msg = MIMEMultipart()
-    msg['From'] = SMTP_USERNAME
-    msg['To'] = to_email
-    msg['Subject'] = subject
-    msg.attach(MIMEText(content, 'plain'))
+    em = EmailMessage()
+    em['From'] = USERNAME
+    em['To'] = to_email
+    em['subject'] = subject
+    em.set_content(content)
 
-    server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-    server.starttls()
-    server.login(SMTP_USERNAME, SMTP_PASSWORD)
-    server.sendmail(SMTP_USERNAME, to_email, msg.as_string())
-    server.quit()
+    with smtplib.SMTP_SSL(SERVER, PORT, CONTEXT) as smtp:
+        smtp.login(USERNAME, PASSWORD)
+        smtp.sendmail(USERNAME, to_email, em.as_string())
 
 @app.route('/sendCode', methods=['POST'])
 def send_code():
@@ -38,11 +41,14 @@ def send_code():
 
     pending_logins[email] = verification_code
 
+    print(pending_logins[email])
+    print(email)
+
     try:
         send_email(email, 'Código de verificación', f'Tu código de verificación es: {verification_code}')
         return 'Código de verificación enviado por correo electrónico.', 200
     except Exception as e:
-        print(e)
+        print(f'Error al enviar el código de verificación por correo electrónico: {e}')  # Imprimir la excepción completa
         return 'Error al enviar el código de verificación por correo electrónico.', 500
 
 @app.route('/verifyCode', methods=['POST'])
@@ -51,10 +57,6 @@ def verify_code():
     code = data['code']
     email = data['email']
 
-    # Aquí puedes realizar la lógica para verificar el código
-    # Por ejemplo, puedes compararlo con un código generado previamente y almacenado en tu base de datos
-
-    # Simplemente para este ejemplo, asumimos que el código es correcto si es '12345678'
     if code == pending_logins[email]:
         del pending_logins[email]
         return 'Código de verificación válido.', 200

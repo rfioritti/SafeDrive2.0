@@ -16,7 +16,7 @@ def receive_area():
     try:
         markers_json = request.get_json()
 
-        print('MarkersJSON recibido:', markers_json)
+        #print('MarkersJSON recibido:', markers_json)
 
         deptos = markers_json.pop('deptos', [])
 
