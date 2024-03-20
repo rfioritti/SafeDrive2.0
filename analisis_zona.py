@@ -219,7 +219,7 @@ def obtener_nivel_riesgo(ruta,accidentes_dep_rpi,db):  # sustituir ruta cuando p
             #print("departamento: "+str(dep))   
             
             # coneccion a bd
-            accidentes = db.collection("accidentes").where("departamento", "==", int(dep)).stream() #consulta a la base de datos pqara obtener todos los accidente del departamento
+            accidentes = db.collection("accidentes").where("departamento", "==", int(dep)).stream() #consulta a la base de datos para obtener todos los accidente del departamento
             
             accidentes_dict = {documento.id: documento.to_dict() for documento in accidentes} # paso la consulta a diccionario
             accidentes = accidentes_dict # guardo el diccionario en accidentes
@@ -229,16 +229,19 @@ def obtener_nivel_riesgo(ruta,accidentes_dep_rpi,db):  # sustituir ruta cuando p
             #csv_file = 'hay_que_borrarlo_depues.csv'
             #guardar_diccionario_en_csv(accidentes,csv_file)
             #accidentes = cargar_csv_a_diccionario(csv_file)
-
+            
+            # observar y eliminar si se cree que no es necesario
             eliminar = []
             for llave,fila in accidentes.items():
                 if fila['departamento'] != dep:
+                    print("eliminado")
                     eliminar.append(llave)
             for ii in eliminar:
                 del accidentes[ii]
-            accidentes_dep_rpi = accidentes
 
-            #print("cargado !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            accidentes_dep_rpi = accidentes
+            
+
         punto_alpha = {'latitud':coord['latitud'],'longitud': coord['longitud']}
 
         lista_accidentes = crear_perimetro_busqueda(punto_alpha,radio_perimetro,accidentes_dep_rpi)
@@ -263,8 +266,11 @@ def obtener_nivel_riesgo(ruta,accidentes_dep_rpi,db):  # sustituir ruta cuando p
 
         riesgo_zona = (cant_accidentes/(promedio_accidentes*2))*10
 
-        retornar = [riesgo_zona,accidentes]
+        retornar = [riesgo_zona,accidentes_dep_rpi]
         print(str(cant_accidentes)+"    "+str(riesgo_zona)) 
+    print("-=-=-=-=--=-=-=-=->")
+    print(retornar)
+    print("<-=-=-=--=-=-=--=-=-=")
 
     return retornar
 
