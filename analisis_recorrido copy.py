@@ -115,7 +115,7 @@ def crear_perimetro_busqueda(punto_alpha,radio_perimetro,accidentes):
     #calculo la distancia a todos los centro en comparacion del punto alpha
     seleccion_aux = calcular_distancias(seleccion,punto_alpha)
 
-    # creo una lista con los centros a menos de radio_perimetro + 3000m del punto alpha
+    # creo una lista con los centros a menos de radio_perimetro + 2000m del punto alpha
     seleccion_aux = eliminar_elementos_por_distancia(seleccion_aux,radio_perimetro)
 
     # elimino todos los elementos que estan fuera del perimetro reducido // en este caso filtramos y solo nos quedamos con los centros que estan amenos de radio_perimetro + 2000m de punto_alpha
@@ -184,9 +184,8 @@ def obtener_nivel_riesgo(ruta,db):  # sustituir ruta cuando pasar al servidor /h
     punto_alpha = -1
     radio_perimetro = 2000 # radio en metros al cual se va aplicar el primetro de busqueda alrededor de un punto_alpha (cada ves que se actualice alpha se hace una busqueda completa)
     radio_busqueda_punto = 25 # radio en metros alrededor de un punto en el cual se buscan accidentes
-    radio_centro_BD = 2000 # esta variable representa a la distancia que se encuentran los puntos al centro en la base de datos(no cambiar esta variable sin cambiar la BD)
-    #actualizacion_alpha = radio_perimetro - radio_centro_BD # medidia en metros utilizada para actualizar alpha, si la dist de alpha al siguiente punto es mayor a actualizacion alpha, entonces se acutualiza punto_alpha
-    actualizacion_alpha = radio_perimetro - radio_busqueda_punto + 1
+    actualizacion_alpha = radio_perimetro - radio_busqueda_punto # medidia en metros utilizada para actualizar alpha, si la dist de alpha al siguiente punto es mayor a actualizacion alpha, entonces se acutualiza punto_alpha
+    
     
     for marcador,coord in ruta.items():
 

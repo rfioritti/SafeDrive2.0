@@ -19,8 +19,10 @@ def receive_area():
         #print('MarkersJSON recibido:', markers_json)
 
         deptos = markers_json.pop('deptos', [])
+        zona_reducida = markers_json.pop('zona', [])
+        punto_alpha = markers_json.pop('alfa', [])
 
-        map_results = obtener_nivel_riesgo(markers_json, deptos, db)
+        map_results = obtener_nivel_riesgo(markers_json,deptos,zona_reducida,punto_alpha, db)
 
         #print(map_results)
 
